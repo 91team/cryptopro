@@ -1,7 +1,8 @@
 # CryptoPRO CSP 5.0
 
 ## Build
-- Put CryptoPRO CSP deb package to `dist/linux-amd64_deb.tgz` path
+
+- Put CryptoPRO CSP 5.0 deb package to `dist/linux-amd64_deb.tgz` path
 
 - Build image `docker build -t registry.91.team/cryptopro/csp:latest .`
 
