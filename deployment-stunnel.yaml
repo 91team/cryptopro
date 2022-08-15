@@ -1,0 +1,90 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: csp-stunnel-pvc
+  labels:
+    app: csp-stunnel
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 16Mi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: csp-stunnel-config
+  labels:
+    app: csp-stunnel
+data:
+  stunnel.conf: |
+    pid = /tmp/stunnel.pid
+    socket = l:TCP_NODELAY=1
+    socket = r:TCP_NODELAY=1
+    debug = 0
+    foreground = yes
+    [https]
+    client = yes
+    accept  = 8080
+    connect = target-host:443
+    verify = 2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: csp-stunnel-deployment
+  labels:
+    app: csp-stunnel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: csp-stunnel
+  template:
+    metadata:
+      labels:
+        app: csp-stunnel
+    spec:
+      containers:
+        - name: stunnel
+          image: registry.91.team/cryptopro/csp:latest
+          command: ["stunnel_thread"]
+          args: ["/stunnel.conf"]
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: keys
+              mountPath: /var/opt/cprocsp/keys/root
+            - name: config
+              mountPath: /stunnel.conf
+              subPath: stunnel.conf
+          envFrom:
+            - secretRef:
+                name: csp-stunnel-secret
+                # name: csp-rest-secret
+      volumes:
+        - name: keys
+          persistentVolumeClaim:
+            claimName: csp-stunnel-pvc
+            # claimName: csp-rest-pvc
+        - name: config
+          configMap:
+            name: csp-stunnel-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: csp-stunnel
+  labels:
+    app: csp-stunnel
+spec:
+  ports:
+    - protocol: TCP
+      port: 8080
+      name: proxy
+  clusterIP: None
+  selector:
+    app: csp-stunnel

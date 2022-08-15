@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
   cd /tmp/src && \
   tar -xf linux-amd64_deb.tgz && \
   linux-amd64_deb/install.sh && \
+  dpkg -i linux-amd64_deb/cprocsp-stunnel-*.deb && \
   cd /bin && \
   ln -s /opt/cprocsp/bin/amd64/certmgr && \
   ln -s /opt/cprocsp/bin/amd64/cpverify && \
@@ -22,6 +23,10 @@ RUN apt-get update && apt-get install -y \
   ln -s /opt/cprocsp/bin/amd64/inittst && \
   ln -s /opt/cprocsp/bin/amd64/wipefile && \
   ln -s /opt/cprocsp/sbin/amd64/cpconfig && \
+  ln -s /opt/cprocsp/sbin/amd64/stunnel_thread && \
+  ln -s /opt/cprocsp/sbin/amd64/stunnel_msspi && \
+  ln -s /opt/cprocsp/sbin/amd64/stunnel_hsm && \
+  ln -s /opt/cprocsp/sbin/amd64/stunnel_fork && \
   rm -rf /tmp/src
 
 VOLUME [ "/var/opt/cprocsp/keys" ]
