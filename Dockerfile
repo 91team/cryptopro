@@ -1,11 +1,15 @@
 FROM debian:buster-slim
 
 ENV TZ="Europe/Moscow" \
-  docker="1"
+  docker="1" \
+  LC_ALL="ru_RU.UTF-8" \
+  LANG="ru_RU.UTF-8" \
+  LANGUAGE="ru_RU.UTF-8"
 
 ADD dist /tmp/src
 
 RUN apt-get update && apt-get install -y \
+  locales-all \
   lsb-base && \
   ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
   echo $TZ > /etc/timezone && \
